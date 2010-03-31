@@ -1,0 +1,55 @@
+== Database Transactions Don't Do What You Think They Do (By Default)
+
+@ http://github.com/ahoward/isolation
+
+in the nosql movement many dbs do not support transactions by default.
+opponents suggest that transactions offer some magic bullet for application
+developers to pretend theirs is the only code operating - via transactions.
+
+at the default isolation level, however, transactions on a rdbms probably
+aren't doing what you think they are doing.  in particular they do NOT prevent
+two *concurrent* transactions from reading each others in-flight updates
+*before* either transaction has committed.
+
+to prove this to yourself download the following
+
+  rake db:create
+
+  rake db:migrate
+
+  in terminal 1: ./script/runner a.rb
+  in terminal 2: ./script/runner b.rb
+  in terminal 3: ./script/runner c.rb
+
+  (see
+    http://github.com/ahoward/isolation/blob/master/a.rb
+    http://github.com/ahoward/isolation/blob/master/b.rb
+    http://github.com/ahoward/isolation/blob/master/c.rb
+
+    http://github.com/ahoward/isolation/blob/master/db/migrate/20100331073651_create_data.rb
+    http://github.com/ahoward/isolation/blob/master/app/models/datum.rb
+  )
+
+after a while you'll see the c.rb script blow up like this:
+
+  ...
+  32
+  33
+  34
+  not isolated: a.value=-1 / b.value=1
+
+or this
+
+  cfp:~/isolation > ./script/runner c.rb
+  ...
+  75
+  76
+  77
+  not isolated: a.value=0 / b.value=0
+
+this is what is known as a 'dirty read' which, put another way, means that
+writes *are not batched* as one unit in the default transaction level of any
+rdbms/orm.
+
+
+rdbms acid refresher: http://www.postgresql.org/docs/8.1/static/transaction-iso.html

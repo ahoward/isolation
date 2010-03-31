@@ -1,0 +1,11 @@
+<% [:test, :development, :production].each do |rails_env| %>
+
+<%= rails_env %>:
+  adapter: postgresql
+  encoding: unicode
+  database: isolation_development
+  pool: 5
+  username:
+  password:
+
+<% end %>
