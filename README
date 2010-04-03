@@ -47,9 +47,9 @@ or this
   77
   not isolated: a.value=0 / b.value=0
 
-this is what is known as a 'dirty read' which, put another way, means that
-writes *are not batched* as one unit in the default transaction level of any
-rdbms/orm.
+this is what is known as a 'non-repeatable read' which, put another way, means
+that even when a reader, 'c', is inside a transaction, they may still be
+reading commits from other commited transactions 'a' and 'b'
 
 
 rdbms acid refresher: http://www.postgresql.org/docs/8.1/static/transaction-iso.html
